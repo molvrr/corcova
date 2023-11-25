@@ -130,7 +130,6 @@ let to_string response =
   else status ^ "\r\n"
 ;;
 
-(* TODO: Lidar com View.t também *)
 let render response ~view =
   response
   |> set_header ~key:"Content-Type" ~value:"text/html"

@@ -16,3 +16,4 @@ type t =
 
 val of_fd : Unix.file_descr -> t (* TODO: Ocultar isso *)
 val get_cookie : t -> key:string -> string option
+val get_header : t -> string -> string option

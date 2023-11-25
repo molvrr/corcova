@@ -91,14 +91,8 @@ let of_fd client =
         Some bitos
       | None -> None
     in
-    let params =
-      match verb, MapString.find_opt "content-type" headers, body with
-      | `POST, Some "application/json", Some body ->
-        Json (Yojson.Safe.from_string (Bytes.to_string body))
-      | _ -> NoParams
-    in
     let cookies = parse_cookies (MapString.find_opt "cookie" headers) in
-    { verb; path; headers; body; params; cookies }
+    { verb; path; headers; body; cookies; params = NoParams }
 ;;
 
 let get_cookie request ~key =
@@ -106,3 +100,5 @@ let get_cookie request ~key =
   | None -> None
   | Some cookies -> MapString.find_opt key cookies
 ;;
+
+let get_header request key = MapString.find_opt key request.headers
