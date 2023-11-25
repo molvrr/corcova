@@ -22,7 +22,7 @@
             ocamlformat
           ];
 
-          buildInputs = with pkgs'.ocamlPackages; [ core core_unix ];
+          buildInputs = with pkgs'.ocamlPackages; [ core core_unix yojson ];
         };
 
         formatter = pkgs.nixfmt;
