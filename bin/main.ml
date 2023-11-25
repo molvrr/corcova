@@ -41,7 +41,7 @@ let json : middleware =
 ;;
 
 let compose (middleware_list : middleware list) =
-  List.fold_left (fun acc f -> f acc) Fun.id middleware_list
+  List.fold_right (fun f acc -> f acc) middleware_list Fun.id
 ;;
 
 let handle_request (routes : route list) (request : Request.t) =
@@ -128,9 +128,30 @@ module Routes = struct
   end
 end
 
+let logger : middleware =
+  fun next_handler req ->
+  let time = Unix.time () |> Unix.gmtime in
+  let () =
+    Format.printf
+      "%02d:%02d:%02d - %s %s\n%!"
+      time.tm_hour
+      time.tm_min
+      time.tm_sec
+      ((function
+         | `GET -> "GET"
+         | `POST -> "POST"
+         | `PATCH -> "PATCH"
+         | `PUT -> "PUT"
+         | `DELETE -> "DELETE")
+         req.verb)
+      req.path
+  in
+  next_handler req
+;;
+
 let router : route list =
   [ Routes.index; Routes.login; Routes.post_login; Routes.logout; Routes.banana ]
-  @ Router.scope "/api" [ json ] [ Routes.Api.user ]
+  @ Router.scope "/api" [ logger; json ] [ Routes.Api.user ]
 ;;
 
 let send response client =
