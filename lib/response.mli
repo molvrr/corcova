@@ -20,7 +20,7 @@ val set_body : t -> body:body -> t
 val set_status : t -> status:http_status -> t
 val set_cookie : t -> key:string -> value:string -> t
 val status : t -> http_status
-val redirect : t -> string -> t
+val redirect : t -> path:string -> t
 val headers_to_string : t -> string
 val status_to_http : t -> string
 val to_string : t -> string

@@ -100,3 +100,9 @@ let of_fd client =
     let cookies = parse_cookies (MapString.find_opt "cookies" headers) in
     { verb; path; headers; body; params; cookies }
 ;;
+
+let get_cookie request ~key =
+  match request.cookies with
+  | None -> None
+  | Some cookies -> MapString.find_opt key cookies
+;;

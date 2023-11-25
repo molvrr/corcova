@@ -38,11 +38,26 @@ module Routes = struct
   open Router
 
   module Get = struct
+    (* TODO: Função para setar body e Content-Type para html *)
     let index =
       get "/" (fun _req res ->
         res
-        |> set_body ~body:(String "<h1>Oi</h1>")
-        |> set_cookie ~key:"username" ~value:"beeeeep")
+        |> set_body
+             ~body:
+               (String
+                  {html|
+                    <!DOCTYPE html>
+                    <html lang="pt-br">
+                      <head>
+                        <meta charset="UTF-8">
+                        <title>Início</title>
+                      </head>
+                      <body>
+                        <h1>oi</h1>
+                      </body>
+                    </html>
+                  |html})
+        |> set_header ~key:"Content-Type" ~value:"text/html")
     ;;
   end
 end

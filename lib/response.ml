@@ -59,7 +59,7 @@ let set_cookie response ~key ~value =
   { response with cookies }
 ;;
 
-let redirect response path =
+let redirect response ~path =
   response
   |> set_header ~key:"Location" ~value:path
   |> set_status ~status:`MovedPermanently
@@ -100,8 +100,11 @@ let to_string response =
     then response |> set_header ~key:"Set-Cookie" ~value:(cookies_to_string response)
     else response
   in
+  let headers_length = response.headers |> MapString.to_list |> List.length in
   let status = status_to_http response in
   let headers = headers_to_string response in
   let body = body_to_string response in
-  status ^ headers ^ "\r\n" ^ body
+  if headers_length > 0
+  then status ^ headers ^ "\r\n" ^ "\r\n" ^ body
+  else status ^ "\r\n"
 ;;
