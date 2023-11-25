@@ -10,6 +10,7 @@ type http_status =
 type body =
   | EmptyBody
   | String of string
+  | Static of string
 
 type headers = string MapString.t
 type cookies = string MapString.t
@@ -32,6 +33,7 @@ let body_to_string response =
   match response.body with
   | EmptyBody -> ""
   | String string -> string
+  | Static filename -> In_channel.input_all @@ open_in filename
 ;;
 
 let set_status (response : t) ~status = { response with status }
@@ -44,6 +46,14 @@ let set_header (response : t) ~key ~value =
 let set_body (response : t) ~(body : body) =
   match body with
   | EmptyBody -> { response with body }
+  | Static filename ->
+    let response =
+      response
+      |> set_header
+           ~key:"Content-Length"
+           ~value:(string_of_int @@ (Unix.stat filename).st_size)
+    in
+    { response with body }
   | String string ->
     let response =
       set_header

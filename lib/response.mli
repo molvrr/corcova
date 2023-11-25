@@ -8,6 +8,7 @@ type http_status =
 type body =
   | EmptyBody
   | String of string
+  | Static of string
 
 type t
 

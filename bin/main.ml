@@ -42,21 +42,7 @@ module Routes = struct
     let index =
       get "/" (fun _req res ->
         res
-        |> set_body
-             ~body:
-               (String
-                  {html|
-                    <!DOCTYPE html>
-                    <html lang="pt-br">
-                      <head>
-                        <meta charset="UTF-8">
-                        <title>Início</title>
-                      </head>
-                      <body>
-                        <h1>oi</h1>
-                      </body>
-                    </html>
-                  |html})
+        |> set_body ~body:(Static "views/index.html")
         |> set_header ~key:"Content-Type" ~value:"text/html")
     ;;
   end
