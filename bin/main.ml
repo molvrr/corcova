@@ -34,6 +34,10 @@ module Router = struct
   let get (path : string) (handler : Request.t -> Response.t -> Response.t) =
     `GET, path, handler
   ;;
+
+  let post (path : string) (handler : Request.t -> Response.t -> Response.t) =
+    `POST, path, handler
+  ;;
 end
 
 module Routes = struct
@@ -49,9 +53,14 @@ module Routes = struct
   ;;
 
   let login = get "/login" (fun req res -> res |> render ~view:"views/login.html")
+
+  let post_login =
+    post "/login" (fun req res ->
+      res |> set_cookie ~key:"username" ~value:"anon" |> redirect ~path:"/")
+  ;;
 end
 
-let router = [ Routes.index; Routes.login ]
+let router = [ Routes.index; Routes.login; Routes.post_login ]
 
 let send response client =
   let open Response in

@@ -59,13 +59,13 @@ let headline_of_string string =
 let parse_cookies = function
   | Some cookies ->
     let parse_cookie string =
-      let sep_pos = String.index string ':' in
+      let sep_pos = String.index string '=' in
       let key = String.sub string 0 sep_pos |> String.lowercase_ascii in
       let vl =
         String.sub string (sep_pos + 2) (String.length string - String.length key - 2)
         |> String.trim
       in
-      key, vl
+      key |> String.trim, vl
     in
     let cookies = String.split_on_char ';' cookies in
     let cookies = List.map parse_cookie cookies in
@@ -97,7 +97,7 @@ let of_fd client =
         Json (Yojson.Safe.from_string (Bytes.to_string body))
       | _ -> NoParams
     in
-    let cookies = parse_cookies (MapString.find_opt "cookies" headers) in
+    let cookies = parse_cookies (MapString.find_opt "cookie" headers) in
     { verb; path; headers; body; params; cookies }
 ;;
 
