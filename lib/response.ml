@@ -11,6 +11,7 @@ type body =
   | EmptyBody
   | String of string
   | Static of string
+  | Html of View.t
 
 type headers = string MapString.t
 type cookies = string MapString.t
@@ -34,6 +35,7 @@ let body_to_string response =
   | EmptyBody -> ""
   | String string -> string
   | Static filename -> In_channel.input_all @@ open_in filename
+  | Html html -> View.to_string html
 ;;
 
 let set_status (response : t) ~status = { response with status }
@@ -44,6 +46,7 @@ let set_header (response : t) ~key ~value =
 ;;
 
 let set_body (response : t) ~(body : body) =
+  (* NOTE: Só definir Content-Length na hora renderizar? *)
   match body with
   | EmptyBody -> { response with body }
   | Static filename ->
@@ -59,6 +62,14 @@ let set_body (response : t) ~(body : body) =
       set_header
         ~key:"Content-Length"
         ~value:(String.length string |> string_of_int)
+        response
+    in
+    { response with body }
+  | Html html ->
+    let response =
+      set_header
+        ~key:"Content-Length"
+        ~value:(string_of_int @@ String.length (View.to_string html))
         response
     in
     { response with body }
@@ -119,8 +130,15 @@ let to_string response =
   else status ^ "\r\n"
 ;;
 
+(* TODO: Lidar com View.t também *)
 let render response ~view =
   response
   |> set_header ~key:"Content-Type" ~value:"text/html"
   |> set_body ~body:(Static view)
+;;
+
+let render_html response ~view =
+  response
+  |> set_header ~key:"Content-Type" ~value:"text/html"
+  |> set_body ~body:(Html view)
 ;;

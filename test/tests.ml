@@ -47,3 +47,26 @@ let%expect_test "Redirect" =
     Location: /login
      |}]
 ;;
+
+let%expect_test "View render" =
+  let open Corcova.View in
+  let response = empty in
+  let body =
+    [ div
+        []
+        [ p [] [ text "<p/> inside a <div/>" ]
+        ; div [] [ p [] [ text "<p/> inside another <div/>" ] ]
+        ]
+    ]
+  in
+  let response = response |> render_html ~view:(html ~title:"Início" ~body) in
+  let string = Corcova.Response.to_string response in
+  print_endline string;
+  [%expect
+    {|
+    HTTP/1.1 200 Ok
+    Content-Type: text/html
+    Content-Length: 151
+    
+    <!DOCTYPE html><html><head><title>Início</title></head><body><div><p><p/> inside a <div/></p><div><p><p/> inside another <div/></p></div></div></body> |}]
+;;

@@ -9,6 +9,7 @@ type body =
   | EmptyBody
   | String of string
   | Static of string
+  | Html of View.t
 
 type t
 
@@ -26,3 +27,4 @@ val headers_to_string : t -> string
 val status_to_http : t -> string
 val to_string : t -> string
 val render : t -> view:string -> t
+val render_html : t -> view:View.t -> t

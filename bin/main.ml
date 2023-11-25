@@ -66,9 +66,17 @@ module Routes = struct
       |> set_cookie ~key:"Max-Age" ~value:"0"
       |> redirect ~path:"/login")
   ;;
+
+  let banana =
+    let open View in
+    get "/banana" (fun req res ->
+      res |> render_html ~view:(html ~title:"Oi" ~body:[ p [] [ text "banana" ] ]))
+  ;;
 end
 
-let router = [ Routes.index; Routes.login; Routes.post_login; Routes.logout ]
+let router =
+  [ Routes.index; Routes.login; Routes.post_login; Routes.logout; Routes.banana ]
+;;
 
 let send response client =
   let open Response in
