@@ -1,2 +1,3 @@
 (library
- (name corcova))
+ (name corcova)
+ (libraries yojson unix))

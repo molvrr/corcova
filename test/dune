@@ -1,2 +1,5 @@
-(test
- (name corcova))
+(library
+  (inline_tests)
+  (name testes)
+  (libraries corcova)
+  (preprocess (pps ppx_expect)))
