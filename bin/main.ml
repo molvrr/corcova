@@ -58,9 +58,17 @@ module Routes = struct
     post "/login" (fun req res ->
       res |> set_cookie ~key:"username" ~value:"anon" |> redirect ~path:"/")
   ;;
+
+  let logout =
+    post "/logout" (fun req res ->
+      res
+      |> set_cookie ~key:"username" ~value:""
+      |> set_cookie ~key:"Max-Age" ~value:"0"
+      |> redirect ~path:"/login")
+  ;;
 end
 
-let router = [ Routes.index; Routes.login; Routes.post_login ]
+let router = [ Routes.index; Routes.login; Routes.post_login; Routes.logout ]
 
 let send response client =
   let open Response in
