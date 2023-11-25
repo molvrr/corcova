@@ -118,3 +118,9 @@ let to_string response =
   then status ^ headers ^ "\r\n" ^ "\r\n" ^ body
   else status ^ "\r\n"
 ;;
+
+let render response ~view =
+  response
+  |> set_header ~key:"Content-Type" ~value:"text/html"
+  |> set_body ~body:(Static view)
+;;

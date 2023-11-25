@@ -23,7 +23,10 @@ let handle_request routes (request : Request.t) =
   in
   match handler_opt with
   | Some handler -> handler request empty
-  | _ -> empty |> set_status ~status:`NotFound
+  | _ ->
+    if String.equal request.path "/not_found"
+    then empty |> set_status ~status:`NotFound |> render ~view:"views/404.html"
+    else redirect ~path:"/not_found" empty
 ;;
 
 (* TODO: Adicionar middleware *)
@@ -35,20 +38,20 @@ end
 
 module Routes = struct
   open Response
+  open Request
   open Router
 
-  module Get = struct
-    (* TODO: Função para setar body e Content-Type para html *)
-    let index =
-      get "/" (fun _req res ->
-        res
-        |> set_body ~body:(Static "views/index.html")
-        |> set_header ~key:"Content-Type" ~value:"text/html")
-    ;;
-  end
+  let index =
+    get "/" (fun req res ->
+      match get_cookie ~key:"username" req with
+      | Some user -> res |> render ~view:"views/index.html"
+      | None -> res |> redirect ~path:"/login")
+  ;;
+
+  let login = get "/login" (fun req res -> res |> render ~view:"views/login.html")
 end
 
-let router = [ Routes.Get.index ]
+let router = [ Routes.index; Routes.login ]
 
 let send response client =
   let open Response in

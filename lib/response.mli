@@ -25,3 +25,4 @@ val redirect : t -> path:string -> t
 val headers_to_string : t -> string
 val status_to_http : t -> string
 val to_string : t -> string
+val render : t -> view:string -> t
