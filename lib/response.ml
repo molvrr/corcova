@@ -141,3 +141,10 @@ let render_html response ~view =
   |> set_header ~key:"Content-Type" ~value:"text/html"
   |> set_body ~body:(Html view)
 ;;
+
+let render_json response ~view =
+  let json = Yojson.Safe.to_string view in
+  response
+  |> set_header ~key:"Content-Type" ~value:"application/json"
+  |> set_body ~body:(String json)
+;;

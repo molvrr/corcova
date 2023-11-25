@@ -1,3 +1,19 @@
 (library
  (name corcova)
+ (modules corcova)
+ (libraries request response view yojson unix))
+
+(library
+ (name request)
+ (modules request)
+ (libraries yojson unix))
+
+(library
+ (name response)
+ (modules response)
+ (libraries view yojson unix))
+
+(library
+ (name view)
+ (modules view)
  (libraries yojson unix))

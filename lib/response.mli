@@ -28,3 +28,4 @@ val status_to_http : t -> string
 val to_string : t -> string
 val render : t -> view:string -> t
 val render_html : t -> view:View.t -> t
+val render_json : t -> view:Yojson.Safe.t -> t
