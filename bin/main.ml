@@ -38,8 +38,8 @@ module Routes = struct
       post "/user" (fun req res ->
         let _params =
           (function
-            | Json json -> json
-            | NoParams -> failwith "Sem json")
+            | Json json -> Some json
+            | NoParams -> None)
             req.params
         in
         res
@@ -49,9 +49,19 @@ module Routes = struct
   end
 end
 
+(*
+   GET /
+   GET /login
+   POST /login
+   POST /logout
+   GET /banana
+   SCOPE     /api
+   ---- POST /user
+*)
+
 let routes : route list =
   [ Routes.index; Routes.login; Routes.post_login; Routes.logout; Routes.banana ]
   @ Router.scope "/api" [ logger; json ] [ Routes.Api.user ]
 ;;
 
-let _ = Corcova.empty |> Router.add_routes ~routes |> Corcova.run
+let () = Corcova.empty |> Router.add_routes ~routes |> Corcova.run
