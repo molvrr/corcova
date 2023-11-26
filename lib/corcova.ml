@@ -115,14 +115,16 @@ let empty = { port = 3000; host = "0.0.0.0"; routes = [] }
 let set_host app ~host = { app with host }
 let set_port app ~port = { app with port }
 
+let socket app =
+  let sock = socket PF_INET SOCK_STREAM 0 in
+  let _ = setsockopt sock SO_REUSEADDR true in
+  let _ = bind sock (ADDR_INET (inet_addr_of_string app.host, app.port)) in
+  let _ = listen sock 10 in
+  sock
+;;
+
 let run app =
-  let sock =
-    let sock = socket PF_INET SOCK_STREAM 0 in
-    let _ = setsockopt sock SO_REUSEADDR true in
-    let _ = bind sock (ADDR_INET (inet_addr_of_string app.host, app.port)) in
-    let _ = listen sock 10 in
-    sock
-  in
+  let sock = socket app in
   let rec main () =
     let client, _ = accept sock in
     let request = Request.of_fd client in
