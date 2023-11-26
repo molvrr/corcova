@@ -5,6 +5,7 @@ type http_status =
   | `Created
   | `MovedPermanently
   | `NotFound
+  | `BadRequest
   ]
 
 type body =
@@ -110,6 +111,7 @@ let status_to_http response =
     | `MovedPermanently -> "301 Moved Permanently"
     | `NotFound -> "404 Not Found"
     | `Created -> "201 Created"
+    | `BadRequest -> "400 Bad Request"
   in
   version ^ " " ^ status ^ "\r\n"
 ;;
@@ -148,3 +150,5 @@ let render_json response ~view =
   |> set_header ~key:"Content-Type" ~value:"application/json"
   |> set_body ~body:(String json)
 ;;
+
+let bad_request response = response |> set_status ~status:`BadRequest
