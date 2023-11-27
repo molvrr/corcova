@@ -60,16 +60,6 @@ module Routes = struct
   end
 end
 
-(*
-   GET /
-   GET /login
-   POST /login
-   POST /logout
-   GET /banana
-   SCOPE     /api
-   ---- POST /user
-*)
-
 let routes : route list =
   Router.scope
     Corcova.Middleware.[ logger; no_cache ]
