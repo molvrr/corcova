@@ -8,19 +8,19 @@
  | |___| (_) | | | (_| (_) \ V / (_| |
   \_____\___/|_|  \___\___/ \_/ \__,_|
 
-                    :ll:. .col:'           
-      :lc;        ckkodkk:dlc:olk'         
-  ldl0KxK0oo    .oc''.'lxcc;;:;cl0,        
- .xkKOxcklcol.col'.l;:'.,;,'...:..lc.      
-    .O,';lxdxxooolo;,,;'oo;'.''xd:,.kk.    
-     ox,dcll;;O0lod;;l,'';'.,,lK:,,dKXd    
-      cdloc::o00k:;:;Kkc::;:o0XolokKkOKc   
-        .ccoco;:kcodx0K0KOOOxl0klKKK:O.    
-             .Odlckok   .     x00l.dxok:   
-             kKXc.K0x         0KK'  .OdO.  
-              ,dkkKK;        xOx'    '00   
-                 lXK;     'dKk'      .0d   
-                 ;c'      lc:        ol.   
+                    λλλλ   λλλλλ         
+      λλλλ        λλλλλλλλλλλλλλλλ       
+  λλλλλλλλλλ     λλλλλλλλλλλλλλλλλλ      
+  λλλλλλλλλλλ λλλλλλλλλλλλλλλλλλλλλλ     
+     λλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλ   
+     λλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλ  
+      λλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλ 
+         λλλλλλλλλλλλλλλλλλλλλλλλλλλλλ   
+             λλλλλλλλ         λλλλ λλλλλ 
+             λλλλ λλλ         λλλλ   λλλ 
+              λλλλλλλ        λλλλ    λλλ 
+                 λλλλ     λλλλλ       λλ 
+                 λλλ      λλλ        λλ  
 ```
 ## Setup (Nix + Flakes)
 ```shell
@@ -29,5 +29,5 @@ $ dune exec ./bin/main.exe
 ```
 
 ## Ideas
-- Dynamic Linking routes so we can add routes in runtime
+- Dynamic linking routes so we can add routes in runtime
 - Managing database access with algebraic effects
