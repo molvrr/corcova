@@ -10,11 +10,17 @@ let%expect_test "Basic response" =
 ;;
 
 let%expect_test "Response with cookies" =
-  let response = empty |> set_cookie ~key:"name" ~value:"banana" in
+  let response =
+    empty
+    |> set_cookie ~key:"name" ~value:"banana"
+    |> set_cookie ~key:"name2" ~value:"banana2"
+  in
   let string = to_string response in
   print_endline string;
-  [%expect {|
+  [%expect
+    {|
   HTTP/1.1 200 Ok
+  Set-Cookie: name2=banana2
   Set-Cookie: name=banana
   
 |}]
@@ -31,8 +37,8 @@ let%expect_test "Response with body" =
   [%expect
     {|
   HTTP/1.1 200 Ok
-  Set-Cookie: name=Mateus
   Content-Length: 11
+  Set-Cookie: name=Mateus
   
   <h1>Oi</h1>
 |}]

@@ -1,5 +1,3 @@
-module MapString = Map.Make (String)
-
 type http_status =
   [ `Ok
   | `Created
@@ -14,8 +12,15 @@ type body =
   | Static of string
   | Html of View.t
 
-type headers = string MapString.t
-type cookies = string MapString.t
+type headers = (string * string) list
+
+type cookie_data =
+  { value : string
+  ; attributes : (string * string) list
+  }
+
+type cookie = string * cookie_data
+type cookies = cookie list
 
 type t =
   { status : http_status
@@ -24,10 +29,7 @@ type t =
   ; cookies : cookies
   }
 
-let empty =
-  { status = `Ok; body = EmptyBody; headers = MapString.empty; cookies = MapString.empty }
-;;
-
+let empty = { status = `Ok; body = EmptyBody; headers = []; cookies = [] }
 let body_of_response { body; _ } = body
 let status { status; _ } = status
 
@@ -42,7 +44,7 @@ let body_to_string response =
 let set_status (response : t) ~status = { response with status }
 
 let set_header (response : t) ~key ~value =
-  let headers = response.headers |> MapString.add key value in
+  let headers = (key, value) :: response.headers in
   { response with headers }
 ;;
 
@@ -76,8 +78,9 @@ let set_body (response : t) ~(body : body) =
     { response with body }
 ;;
 
-let set_cookie response ~key ~value =
-  let cookies = MapString.add key value response.cookies in
+(* NOTE: Aceitar apenas atributos específicos pode ser uma ideia melhor. *)
+let set_cookie ?(attributes : (string * string) list = []) response ~key ~value =
+  let cookies = (key, { value; attributes }) :: response.cookies in
   { response with cookies }
 ;;
 
@@ -87,18 +90,17 @@ let redirect response ~path =
   |> set_status ~status:`MovedPermanently
 ;;
 
-let cookies_to_string response =
-  let cookies = response.cookies in
-  let cookies =
-    MapString.fold (fun key value acc -> (key ^ "=" ^ value) :: acc) cookies []
-  in
-  String.concat ";" cookies
+let cookie_to_string ((key, data) : cookie) =
+  let attrs = List.map (fun (k, v) -> k ^ "=" ^ v) data.attributes in
+  if List.length attrs > 0
+  then key ^ "=" ^ data.value ^ ";" ^ String.concat ";" attrs
+  else key ^ "=" ^ data.value
 ;;
 
 let headers_to_string response =
   let headers = response.headers in
   let headers =
-    MapString.fold (fun key value acc -> (key ^ ": " ^ value) :: acc) headers []
+    List.fold_left (fun acc (key, value) -> (key ^ ": " ^ value) :: acc) [] headers
   in
   String.concat "\r\n" headers
 ;;
@@ -117,13 +119,17 @@ let status_to_http response =
 ;;
 
 let to_string response =
-  let cookies_length = response.cookies |> MapString.to_list |> List.length in
+  let cookies_length = response.cookies |> List.length in
   let response =
     if cookies_length > 0
-    then response |> set_header ~key:"Set-Cookie" ~value:(cookies_to_string response)
+    then
+      List.fold_left
+        (fun response value -> set_header ~key:"Set-Cookie" ~value response)
+        response
+        (List.map cookie_to_string response.cookies)
     else response
   in
-  let headers_length = response.headers |> MapString.to_list |> List.length in
+  let headers_length = response.headers |> List.length in
   let status = status_to_http response in
   let headers = headers_to_string response in
   let body = body_to_string response in

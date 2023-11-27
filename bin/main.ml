@@ -12,8 +12,14 @@ module Routes = struct
       | None -> res |> redirect ~path:"/login")
   ;;
 
-  let alt = get "/alt" (fun _req res -> set_body ~body:(Html Views.User.index) res)
-  let login = get "/login" (fun _req res -> res |> render ~view:"views/login.html")
+  let alt = get "/alt" (fun _req res -> res |> set_body ~body:(Html Views.User.index))
+
+  let login =
+    get "/login" (fun req res ->
+      match get_cookie ~key:"username" req with
+      | Some _ -> res |> redirect ~path:"/"
+      | None -> render ~view:"views/login.html" res)
+  ;;
 
   let post_login =
     post "/login" (fun _req res ->
@@ -23,8 +29,7 @@ module Routes = struct
   let logout =
     post "/logout" (fun _req res ->
       res
-      |> set_cookie ~key:"username" ~value:""
-      |> set_cookie ~key:"Max-Age" ~value:"0"
+      |> set_cookie ~key:"username" ~value:"" ~attributes:[ "Max-Age", "0" ]
       |> redirect ~path:"/login")
   ;;
 
