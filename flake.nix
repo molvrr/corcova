@@ -29,7 +29,7 @@
           pname = "corcova";
           version = "0.0.0";
           src = ./.;
-          buildInputs = with pkgs'.ocamlPackages; [ yojson ppx_expect utop ];
+          buildInputs = with pkgs'.ocamlPackages; [ yojson ];
         };
 
         formatter = pkgs.nixfmt;
