@@ -1,9 +1,11 @@
 open Corcova
+open Router
 
-module Routes = struct
-  open Response
+module Routes : sig
+  val all : route list
+end = struct
   open Request
-  open Router
+  open Response
 
   let index =
     get "/" (fun req res ->
@@ -58,23 +60,17 @@ module Routes = struct
         res |> set_body ~body:(String {|{"name": "AAAAAAAA"}|}))
     ;;
   end
+
+  let all : route list =
+    Router.scope
+      Corcova.Middleware.[ logger; no_cache ]
+      [ index; login; post_login; logout; banana; alt ]
+    @ Router.scope
+        ~prefix:"/api"
+        Corcova.Middleware.[ logger; json; no_cache ]
+        [ Api.user ]
+    |> Router.Debug.make
+  ;;
 end
 
-let routes : route list =
-  Router.scope
-    Corcova.Middleware.[ logger; no_cache ]
-    [ Routes.index
-    ; Routes.login
-    ; Routes.post_login
-    ; Routes.logout
-    ; Routes.banana
-    ; Routes.alt
-    ]
-  @ Router.scope
-      ~prefix:"/api"
-      Corcova.Middleware.[ logger; json; no_cache ]
-      [ Routes.Api.user ]
-  |> Router.Debug.make
-;;
-
-let () = Corcova.empty |> Router.add_routes ~routes |> Corcova.run
+let () = empty |> add_routes ~routes:Routes.all |> run
