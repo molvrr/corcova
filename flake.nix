@@ -22,11 +22,14 @@
             ocamlformat
           ];
 
-          buildInputs = with pkgs'.ocamlPackages; [
-            yojson
-            ppx_expect
-            utop
-          ];
+          buildInputs = with pkgs'.ocamlPackages; [ yojson ppx_expect utop ];
+        };
+
+        packages.default = pkgs'.ocamlPackages.buildDunePackage rec {
+          pname = "corcova";
+          version = "0.0.0";
+          src = ./.;
+          buildInputs = with pkgs'.ocamlPackages; [ yojson ppx_expect utop ];
         };
 
         formatter = pkgs.nixfmt;

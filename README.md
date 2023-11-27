@@ -22,10 +22,16 @@
                  λλλλ     λλλλλ       λλ 
                  λλλ      λλλ        λλ  
 ```
-## Setup (Nix + Flakes)
+Small CRUD in OCaml.
+## Development Environment (Nix + Flakes)
 ```shell
 $ nix develop -c $SHELL
 $ dune exec ./bin/main.exe
+```
+
+## Building (Nix + Flakes)
+```shell
+$ nix build
 ```
 
 ## Ideas
