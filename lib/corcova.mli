@@ -14,8 +14,21 @@ module Response = Response
 module View = View
 
 module Router : sig
-  val scope : string -> middleware list -> route list -> route list
+  val scope : ?prefix:string -> middleware list -> route list -> route list
   val get : string -> (Request.t -> Response.t -> Response.t) -> route
   val post : string -> (Request.t -> Response.t -> Response.t) -> route
   val add_routes : t -> routes:route list -> t
+
+  module Utils : sig
+    val path : route -> string
+    val verb : route -> string
+  end
+
+  module Debug : sig
+    val make : route list -> route list
+  end
+
+  module Infix : sig
+    val ( / ) : string -> string -> string
+  end
 end

@@ -5,6 +5,7 @@ module Response = Response
 
 type handler = Request.t -> Request.t
 type request_handler = Request.t -> Response.t -> Response.t
+(* TODO: Função para aplicar middleware a uma única rota *)
 type middleware = handler -> handler
 
 type route =
@@ -60,11 +61,24 @@ let handle_request (routes : route list) (request : Request.t) =
 ;;
 
 module Router = struct
-  let scope prefix (middleware_list : middleware list) routes =
+  module Infix = struct
+    (** (/ [p1] [2]) cria um caminho válido para uma rota. *)
+    let ( / ) p1 p2 =
+      let p1_list =
+        String.split_on_char '/' p1 |> List.filter (fun seg -> not (String.equal "" seg))
+      in
+      let p2_list =
+        String.split_on_char '/' p2 |> List.filter (fun seg -> not (String.equal "" seg))
+      in
+      "/" ^ String.concat "/" (p1_list @ p2_list)
+    ;;
+  end
+
+  let scope ?(prefix="") (middleware_list : middleware list) routes =
     List.map
       (fun route ->
         { route with
-          path = prefix ^ route.path
+          path = Infix.( / ) prefix route.path
         ; middlewares = middleware_list @ route.middlewares
         })
       routes
@@ -81,6 +95,56 @@ module Router = struct
   let add_routes app ~routes =
     List.fold_left (fun app route -> { app with routes = route :: app.routes }) app routes
   ;;
+
+  module Utils = struct
+    let path { path; _ } = path
+
+    let verb { verb; _ } =
+      match verb with
+      | `GET -> "GET"
+      | `POST -> "POST"
+      | `DELETE -> "DELETE"
+      | `PUT -> "PUT"
+      | `PATCH -> "PATCH"
+    ;;
+  end
+
+  (** Add debug routes. *)
+  module Debug = struct
+    open Response
+    open View
+
+    let requests_counter = ref 0
+
+    let counter_middleware : middleware =
+      fun next_handler request ->
+      let () = requests_counter := !requests_counter + 1 in
+      next_handler request
+    ;;
+
+    let routes_index routes =
+      let compose arg = Utils.verb arg ^ " " ^ Utils.path arg in
+      let routes =
+        List.map compose routes
+        |> List.map txt
+        |> List.map (fun route -> div [] [ route ])
+      in
+      let body = [ div [] routes ] in
+      let view = html ~title:"routes" ~body in
+      get "/routes" (fun _req res -> res |> set_body ~body:(Html view))
+    ;;
+
+    let counter_page =
+      get "/stats" (fun _req res ->
+        res
+        |> set_body ~body:(String ("<h1>" ^ string_of_int !requests_counter ^ "</h1>")))
+    ;;
+
+    let make routes =
+      scope ~prefix:"/debug" [] [ routes_index routes; counter_page ]
+      @ scope [ counter_middleware ] routes
+    ;;
+  end
 end
 
 let logger : middleware =

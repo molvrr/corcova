@@ -8,6 +8,14 @@ type element =
       ; attributes : (string * string) list
       }
   | Text of string
+  | UnorderedList of
+      { children : element list
+      ; attributes : (string * string) list
+      }
+  | Image of
+      { alt : string
+      ; src : string
+      }
 
 type t =
   { title : string
@@ -15,9 +23,11 @@ type t =
   }
 
 let html ~title ~body = { body; title }
+let ul attributes children = UnorderedList { children; attributes }
 let div attributes children = Div { children; attributes }
 let p attributes children = Paragraph { children; attributes }
-let text string = Text string
+let txt string = Text string
+let img ~alt ~src = Image { alt; src }
 
 let rec render_element html =
   match html with
@@ -28,6 +38,8 @@ let rec render_element html =
   | Paragraph { children; _ } ->
     "<p>" ^ (List.fold_left (fun acc v -> acc ^ render_element v)) "" children ^ "</p>"
   | Text string -> string
+  | UnorderedList { children = _children; _ } -> "<ul>" ^ "</ul>"
+  | Image { alt; src } -> "<img src=\"" ^ src ^ "\"" ^ " alt=\"" ^ alt ^ "\"/>"
 ;;
 
 let to_string { body; title } =

@@ -30,7 +30,20 @@ module Routes = struct
   let banana =
     let open View in
     get "/banana" (fun _req res ->
-      res |> render_html ~view:(html ~title:"Oi" ~body:[ p [] [ text "banana" ] ]))
+      res
+      |> render_html
+           ~view:
+             (html
+                ~title:"Oi"
+                ~body:
+                  [ p
+                      []
+                      [ img
+                          ~src:
+                            "https://t4.ftcdn.net/jpg/00/53/03/69/360_F_53036913_Fn9JosHqTi97KQJ40q4i4zgimPhJhLAm.jpg"
+                          ~alt:"Uma banana"
+                      ]
+                  ]))
   ;;
 
   module Api = struct
@@ -61,7 +74,8 @@ end
 
 let routes : route list =
   [ Routes.index; Routes.login; Routes.post_login; Routes.logout; Routes.banana ]
-  @ Router.scope "/api" [ logger; json ] [ Routes.Api.user ]
+  @ Router.scope ~prefix:"/api" [ logger; json ] [ Routes.Api.user ]
+  |> Router.Debug.make
 ;;
 
 let () = Corcova.empty |> Router.add_routes ~routes |> Corcova.run
