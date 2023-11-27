@@ -1,5 +1,7 @@
 open Corcova
 
+let _db = Hashtbl.create 5
+
 module Routes = struct
   open Response
   open Request
@@ -12,6 +14,7 @@ module Routes = struct
       | None -> res |> redirect ~path:"/login")
   ;;
 
+  let alt = get "/alt" (fun _req res -> set_body ~body:(Html Views.User.index) res)
   let login = get "/login" (fun _req res -> res |> render ~view:"views/login.html")
 
   let post_login =
@@ -48,16 +51,8 @@ module Routes = struct
 
   module Api = struct
     let user =
-      post "/user" (fun req res ->
-        let _params =
-          (function
-            | Json json -> Some json
-            | NoParams -> None)
-            req.params
-        in
-        res
-        |> set_body ~body:(String {|{"name": "AAAAAAAA"}|})
-        |> set_header ~key:"Content-Type" ~value:"application/json")
+      get "/user" (fun _req res ->
+        res |> set_body ~body:(String {|{"name": "AAAAAAAA"}|}))
     ;;
   end
 end
@@ -73,7 +68,13 @@ end
 *)
 
 let routes : route list =
-  [ Routes.index; Routes.login; Routes.post_login; Routes.logout; Routes.banana ]
+  [ Routes.index
+  ; Routes.login
+  ; Routes.post_login
+  ; Routes.logout
+  ; Routes.banana
+  ; Routes.alt
+  ]
   @ Router.scope ~prefix:"/api" [ logger; json ] [ Routes.Api.user ]
   |> Router.Debug.make
 ;;

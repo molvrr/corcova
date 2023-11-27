@@ -1,0 +1,3 @@
+(library
+ (name views)
+ (libraries corcova))

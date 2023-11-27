@@ -2,4 +2,4 @@
  (public_name corcova)
  (name main)
  (flags (:standard -cclib -static))
- (libraries corcova unix yojson))
+ (libraries views corcova unix yojson))

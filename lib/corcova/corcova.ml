@@ -140,8 +140,11 @@ module Router = struct
         |> set_body ~body:(String ("<h1>" ^ string_of_int !requests_counter ^ "</h1>")))
     ;;
 
+    let index =
+      get "/" (fun _req res -> res |> set_body ~body:(String ({|<a href="/debug/stats"">Stats</a>|})))
+
     let make routes =
-      scope ~prefix:"/debug" [] [ routes_index routes; counter_page ]
+      scope ~prefix:"/debug" [] [ index; routes_index routes; counter_page ]
       @ scope [ counter_middleware ] routes
     ;;
   end

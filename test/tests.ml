@@ -54,8 +54,8 @@ let%expect_test "View render" =
   let body =
     [ div
         []
-        [ p [] [ text "<p/> inside a <div/>" ]
-        ; div [] [ p [] [ text "<p/> inside another <div/>" ] ]
+        [ p [] [ txt "<p/> inside a <div/>" ]
+        ; div [] [ p [] [ txt "<p/> inside another <div/>" ] ]
         ]
     ]
   in

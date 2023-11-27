@@ -23,8 +23,6 @@
           ];
 
           buildInputs = with pkgs'.ocamlPackages; [
-            core
-            core_unix
             yojson
             ppx_expect
             utop
