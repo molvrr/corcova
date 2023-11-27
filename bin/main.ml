@@ -1,7 +1,5 @@
 open Corcova
 
-let _db = Hashtbl.create 5
-
 module Routes = struct
   open Response
   open Request

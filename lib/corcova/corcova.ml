@@ -24,7 +24,6 @@ type t =
 let json : middleware =
   let open Request in
   fun handler req ->
-    let _headers = req.headers in
     let is_json =
       Request.get_header req "content-type"
       |> Option.map (String.equal "application/json")
