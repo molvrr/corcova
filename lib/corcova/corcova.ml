@@ -3,10 +3,11 @@ module View = View
 module Request = Request
 module Response = Response
 
-type handler = Request.t -> Request.t
-type request_handler = Request.t -> Response.t -> Response.t
+type handler = Request.t -> Response.t -> Request.t * Response.t
+
 (* TODO: Função para aplicar middleware a uma única rota *)
 type middleware = handler -> handler
+type request_handler = Request.t -> Response.t -> Response.t
 
 type route =
   { verb : [ `DELETE | `GET | `PATCH | `POST | `PUT ]
@@ -20,6 +21,11 @@ type t =
   ; host : string
   ; routes : route list
   }
+
+let no_cache : middleware =
+  fun handler req res ->
+  handler req (Response.set_header ~key:"Cache-Control" ~value:"no-store" res)
+;;
 
 let json : middleware =
   let open Request in
@@ -41,7 +47,8 @@ let json : middleware =
 ;;
 
 let compose (middleware_list : middleware list) =
-  List.fold_right (fun f acc -> f acc) middleware_list Fun.id
+  let id req resp = req, resp in
+  List.fold_right (fun f acc -> f acc) middleware_list id
 ;;
 
 let handle_request (routes : route list) (request : Request.t) =
@@ -52,7 +59,9 @@ let handle_request (routes : route list) (request : Request.t) =
       routes
   in
   match route_opt with
-  | Some route -> route.handler (compose route.middlewares request) empty
+  | Some route ->
+    let request, response = (compose route.middlewares request) empty in
+    route.handler request response
   | _ ->
     if String.equal request.path "/not_found"
     then empty |> set_status ~status:`NotFound |> render ~view:"views/404.html"
@@ -73,7 +82,7 @@ module Router = struct
     ;;
   end
 
-  let scope ?(prefix="") (middleware_list : middleware list) routes =
+  let scope ?(prefix = "") (middleware_list : middleware list) routes =
     List.map
       (fun route ->
         { route with
@@ -140,7 +149,9 @@ module Router = struct
     ;;
 
     let index =
-      get "/" (fun _req res -> res |> set_body ~body:(String ({|<a href="/debug/stats"">Stats</a>|})))
+      get "/" (fun _req res ->
+        res |> set_body ~body:(String {|<a href="/debug/stats"">Stats</a>|}))
+    ;;
 
     let make routes =
       scope ~prefix:"/debug" [] [ index; routes_index routes; counter_page ]

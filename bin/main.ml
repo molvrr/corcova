@@ -66,14 +66,16 @@ end
 *)
 
 let routes : route list =
-  [ Routes.index
-  ; Routes.login
-  ; Routes.post_login
-  ; Routes.logout
-  ; Routes.banana
-  ; Routes.alt
-  ]
-  @ Router.scope ~prefix:"/api" [ logger; json ] [ Routes.Api.user ]
+  Router.scope
+    [ logger; no_cache ]
+    [ Routes.index
+    ; Routes.login
+    ; Routes.post_login
+    ; Routes.logout
+    ; Routes.banana
+    ; Routes.alt
+    ]
+  @ Router.scope ~prefix:"/api" [ logger; json; no_cache ] [ Routes.Api.user ]
   |> Router.Debug.make
 ;;
 

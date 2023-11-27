@@ -1,5 +1,5 @@
-type handler
-type middleware
+type handler = Request.t -> Response.t -> Request.t * Response.t
+type middleware = handler -> handler
 type route
 type t
 
@@ -8,6 +8,7 @@ val set_host : t -> host:string -> t
 val set_port : t -> port:int -> t
 val json : middleware
 val logger : middleware
+val no_cache : middleware
 val run : t -> unit
 
 module Response = Response
