@@ -67,7 +67,7 @@ end
 
 let routes : route list =
   Router.scope
-    [ logger; no_cache ]
+    Corcova.Middleware.[ logger; no_cache ]
     [ Routes.index
     ; Routes.login
     ; Routes.post_login
@@ -75,7 +75,10 @@ let routes : route list =
     ; Routes.banana
     ; Routes.alt
     ]
-  @ Router.scope ~prefix:"/api" [ logger; json; no_cache ] [ Routes.Api.user ]
+  @ Router.scope
+      ~prefix:"/api"
+      Corcova.Middleware.[ logger; json; no_cache ]
+      [ Routes.Api.user ]
   |> Router.Debug.make
 ;;
 

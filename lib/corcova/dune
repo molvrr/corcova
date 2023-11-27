@@ -1,7 +1,7 @@
 (library
  (name corcova)
  (modules corcova)
- (libraries request response view yojson unix))
+ (libraries middleware request response view yojson unix))
 
 (library
  (name request)
@@ -17,3 +17,8 @@
  (name view)
  (modules view)
  (libraries yojson unix))
+
+(library
+ (name middleware)
+ (modules middleware)
+ (libraries request response yojson unix))
