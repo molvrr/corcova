@@ -63,7 +63,7 @@ module Router = struct
     List.map
       (fun route ->
         { route with
-          path = Infix.( / ) prefix route.path
+          path = Infix.(prefix / route.path)
         ; middlewares = middleware_list @ route.middlewares
         })
       routes
