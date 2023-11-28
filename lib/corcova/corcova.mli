@@ -27,8 +27,4 @@ module Router : sig
   module Debug : sig
     val make : route list -> route list
   end
-
-  module Infix : sig
-    val ( / ) : string -> string -> string
-  end
 end

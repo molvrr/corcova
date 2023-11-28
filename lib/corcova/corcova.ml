@@ -51,24 +51,11 @@ let handle_request (routes : route list) (request : Request.t) =
 ;;
 
 module Router = struct
-  module Infix = struct
-    (** (/ [p1] [2]) cria um caminho válido para uma rota. *)
-    let ( / ) p1 p2 =
-      let p1_list =
-        String.split_on_char '/' p1 |> List.filter (fun seg -> not (String.equal "" seg))
-      in
-      let p2_list =
-        String.split_on_char '/' p2 |> List.filter (fun seg -> not (String.equal "" seg))
-      in
-      "/" ^ String.concat "/" (p1_list @ p2_list)
-    ;;
-  end
-
   let scope ?(prefix = "") (middleware_list : middleware list) routes =
     List.map
       (fun route ->
         { route with
-          path = Infix.(prefix / route.path)
+          path = prefix ^ route.path
         ; middlewares = middleware_list @ route.middlewares
         })
       routes

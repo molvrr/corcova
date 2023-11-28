@@ -76,21 +76,3 @@ let%expect_test "View render" =
     
     <!DOCTYPE html><html><head><title>Início</title></head><body><div><p><p/> inside a <div/></p><div><p><p/> inside another <div/></p></div></div></body> |}]
 ;;
-
-let%expect_test "Infix with a path which is a slash and another with a leading slash" =
-  let open Corcova.Router.Infix in
-  let p1 = "/" in
-  let p2 = "/api" in
-  print_endline (p1 / p2);
-  [%expect {|/api|}]
-;;
-
-let%expect_test "Infix with a path which has a trailing slash and another with a leading \
-                 slash"
-  =
-  let open Corcova.Router.Infix in
-  let p1 = "api/" in
-  let p2 = "/users" in
-  print_endline (p1 / p2);
-  [%expect {|/api/users|}]
-;;
