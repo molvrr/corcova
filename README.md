@@ -34,6 +34,10 @@ $ dune exec ./bin/main.exe
 $ nix build
 ```
 
+## TODO
+- [ ] Request stages (separate middleware)
+- [ ] Route params
+
 ## Ideas
 - Dynamic linking routes so we can add routes in runtime
 - Managing database access with algebraic effects

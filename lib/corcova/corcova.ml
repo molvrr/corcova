@@ -37,8 +37,13 @@ let handle_request (routes : route list) (request : Request.t) =
   in
   match route_opt with
   | Some route ->
-    let request, response = (compose route.middlewares request) empty in
-    route.handler request response
+    let _, response =
+      (compose
+         (route.middlewares @ [ (fun _ req res -> req, route.handler req res) ])
+         request)
+        empty
+    in
+    response
   | _ ->
     if String.equal request.path "/not_found"
     then empty |> set_status ~status:`NotFound |> render ~view:"views/404.html"
