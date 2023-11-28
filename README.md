@@ -37,6 +37,7 @@ $ nix build
 ## TODO
 - [ ] Request stages (separate middleware)
 - [ ] Route params
+- [ ] Validators
 
 ## Ideas
 - Dynamic linking routes so we can add routes in runtime
