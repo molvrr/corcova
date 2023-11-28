@@ -38,7 +38,9 @@ $ nix build
 - [ ] Request stages (separate middleware)
 - [ ] Route params
 - [ ] Validators
+- [ ] Use only Tyxml for views
 
 ## Ideas
 - Dynamic linking routes so we can add routes in runtime
 - Managing database access with algebraic effects
+- Embed Lua
