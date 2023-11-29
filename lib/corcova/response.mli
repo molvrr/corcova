@@ -9,8 +9,8 @@ type http_status =
 type body =
   | EmptyBody
   | String of string
-  | Static of string
   | Html of View.t
+  | Json of Yojson.Safe.t
 
 type t
 
@@ -26,7 +26,5 @@ val redirect : t -> path:string -> t
 val headers_to_string : t -> string
 val status_to_http : t -> string
 val to_string : t -> string
-val render : t -> view:string -> t
-val render_html : t -> view:View.t -> t
-val render_json : t -> view:Yojson.Safe.t -> t
+val render : t -> view:body -> t
 val bad_request : t -> t

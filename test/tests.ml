@@ -65,7 +65,7 @@ let%expect_test "View render" =
         ]
     ]
   in
-  let response = response |> render_html ~view:(html ~title:"Início" ~body) in
+  let response = response |> render ~view:(Html (html "Início" body)) in
   let string = Corcova.Response.to_string response in
   print_endline string;
   [%expect

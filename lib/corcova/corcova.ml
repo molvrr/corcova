@@ -44,10 +44,7 @@ let handle_request (routes : route list) (request : Request.t) =
         empty
     in
     response
-  | _ ->
-    if String.equal request.path "/not_found"
-    then empty |> set_status ~status:`NotFound |> render ~view:"views/404.html"
-    else redirect ~path:"/not_found" empty
+  | None -> empty |> set_status ~status:`NotFound
 ;;
 
 module Router = struct
@@ -107,7 +104,7 @@ module Router = struct
         |> List.map (fun route -> div [] [ route ])
       in
       let body = [ div [] routes ] in
-      let view = html ~title:"routes" ~body in
+      let view = html "routes" body in
       get "/routes" (fun _req res -> res |> set_body ~body:(Html view))
     ;;
 

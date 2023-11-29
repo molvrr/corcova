@@ -9,8 +9,8 @@ type http_status =
 type body =
   | EmptyBody
   | String of string
-  | Static of string
   | Html of View.t
+  | Json of Yojson.Safe.t
 
 type headers = (string * string) list
 
@@ -37,8 +37,8 @@ let body_to_string response =
   match response.body with
   | EmptyBody -> ""
   | String string -> string
-  | Static filename -> In_channel.input_all @@ open_in filename
   | Html html -> View.to_string html
+  | Json json -> Yojson.Safe.to_string json
 ;;
 
 let set_status (response : t) ~status = { response with status }
@@ -52,12 +52,12 @@ let set_body (response : t) ~(body : body) =
   (* NOTE: Só definir Content-Length na hora renderizar? *)
   match body with
   | EmptyBody -> { response with body }
-  | Static filename ->
+  | Json json ->
     let response =
-      response
-      |> set_header
-           ~key:"Content-Length"
-           ~value:(string_of_int @@ (Unix.stat filename).st_size)
+      set_header
+        ~key:"Content-Length"
+        ~value:(String.length @@ Yojson.Safe.to_string json |> string_of_int)
+        response
     in
     { response with body }
   | String string ->
@@ -93,7 +93,7 @@ let redirect response ~path =
 let cookie_to_string ((key, data) : cookie) =
   let attrs = List.map (fun (k, v) -> k ^ "=" ^ v) data.attributes in
   if List.length attrs > 0
-  then key ^ "=" ^ data.value ^ ";" ^ String.concat ";" attrs
+  then Format.sprintf "%s=%s;%s" key data.value @@ String.concat ";" attrs
   else key ^ "=" ^ data.value
 ;;
 
@@ -115,7 +115,7 @@ let status_to_http response =
     | `Created -> "201 Created"
     | `BadRequest -> "400 Bad Request"
   in
-  version ^ " " ^ status ^ "\r\n"
+  Format.asprintf "%s %s\r\n" version status
 ;;
 
 let to_string response =
@@ -134,27 +134,21 @@ let to_string response =
   let headers = headers_to_string response in
   let body = body_to_string response in
   if headers_length > 0
-  then status ^ headers ^ "\r\n" ^ "\r\n" ^ body
+  then Format.asprintf "%s%s\r\n\r\n%s" status headers body
   else status ^ "\r\n"
 ;;
 
+let content_type_of_body = function
+  | String _ -> Some "text/plain"
+  | Html _ -> Some "text/html"
+  | Json _ -> Some "application/json"
+  | EmptyBody -> None
+;;
+
 let render response ~view =
-  response
-  |> set_header ~key:"Content-Type" ~value:"text/html"
-  |> set_body ~body:(Static view)
-;;
-
-let render_html response ~view =
-  response
-  |> set_header ~key:"Content-Type" ~value:"text/html"
-  |> set_body ~body:(Html view)
-;;
-
-let render_json response ~view =
-  let json = Yojson.Safe.to_string view in
-  response
-  |> set_header ~key:"Content-Type" ~value:"application/json"
-  |> set_body ~body:(String json)
+  match content_type_of_body view with
+  | Some value -> response |> set_header ~key:"Content-Type" ~value |> set_body ~body:view
+  | None -> response (* TODO: Setar status 204? *)
 ;;
 
 let bad_request response = response |> set_status ~status:`BadRequest

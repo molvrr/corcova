@@ -6,6 +6,7 @@ val set_host : t -> host:string -> t
 val set_port : t -> port:int -> t
 val run : t -> unit
 
+module Request = Request
 module Response = Response
 module View = View
 module Middleware = Middleware

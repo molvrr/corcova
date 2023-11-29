@@ -1,5 +1,3 @@
-module V = Corcova.View
+open Corcova.View
 
-let make_view ~title element =
-  V.html ~title ~body:[ V.div [] [ V.txt "Corcova"; element ] ]
-;;
+let make_view ~title elements = Corcova.Response.Html (html title elements)

@@ -62,7 +62,7 @@ let parse_cookies = function
       let sep_pos = String.index string '=' in
       let key = String.sub string 0 sep_pos |> String.lowercase_ascii in
       let vl =
-        String.sub string (sep_pos + 2) (String.length string - String.length key - 2)
+        String.sub string (sep_pos + 1) (String.length string - String.length key - 1)
         |> String.trim
       in
       key |> String.trim, vl
