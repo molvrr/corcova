@@ -1,3 +1,4 @@
 (library
  (name views)
- (libraries corcova))
+ (libraries corcova)
+ (flags -short-paths))

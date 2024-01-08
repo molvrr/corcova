@@ -31,7 +31,7 @@ module Routes = struct
       |> redirect ~path:"/login")
   ;;
 
-  let banana = get "/banana" (fun _req res -> res |> render ~view:Views.User.banana)
+  let banana = get "/banana" (fun _req -> render ~view:Views.User.banana)
 
   module Api = struct
     let user =
@@ -52,10 +52,11 @@ module Routes = struct
   ;;
 
   let aaaaa = post "/banana" (fun _req res -> res)
+  let style = get "/style.css" (fun _req -> set_body ~body:(Static "style.css"))
 
   let all : route list =
     let open Router in
-    scope [] [ index; login; post_login; logout; banana; aaaaa ]
+    scope [] [ style; index; login; post_login; logout; banana; aaaaa ]
     @ scope ~prefix:"/api" [ skip_unless_authenticated ] [ Api.user ]
     |> Debug.make
   ;;

@@ -3,6 +3,7 @@ module View = View
 module Request = Request
 module Response = Response
 module Middleware = Middleware
+module H = Tyxml.Html
 
 type handler = Middleware.handler
 
@@ -104,7 +105,6 @@ module Router = struct
   (** Add debug routes. *)
   module Debug = struct
     open Response
-    open View
 
     let requests_counter = ref 0
 
@@ -118,11 +118,11 @@ module Router = struct
       let compose arg = Utils.verb arg ^ " " ^ Utils.path arg in
       let routes =
         List.map compose routes
-        |> List.map txt
-        |> List.map (fun route -> div [] [ route ])
+        |> List.map H.txt
+        |> List.map (fun route -> H.div [ route ])
       in
-      let body = [ div [] routes ] in
-      let view = html "routes" body in
+      let body = H.body [ H.div routes ] in
+      let view = H.html (H.head (H.title (H.txt "routes")) []) body in
       get "/routes" (fun _req res -> res |> set_body ~body:(Html view))
     ;;
 

@@ -9,8 +9,9 @@ type http_status =
 type body =
   | EmptyBody
   | String of string
-  | Html of View.t
+  | Html of Tyxml_html.doc
   | Json of Yojson.Safe.t
+  | Static of string
 
 type headers = (string * string) list
 
@@ -37,8 +38,13 @@ let body_to_string response =
   match response.body with
   | EmptyBody -> ""
   | String string -> string
-  | Html html -> View.to_string html
+  | Html html -> Format.asprintf "%a" (Tyxml.Html.pp ()) html
   | Json json -> Yojson.Safe.to_string json
+  | Static filename ->
+    let ic = open_in filename in
+    let file_data = In_channel.input_all ic in
+    let () = close_in ic in
+    file_data
 ;;
 
 let set_status (response : t) ~status = { response with status }
@@ -72,7 +78,22 @@ let set_body (response : t) ~(body : body) =
     let response =
       set_header
         ~key:"Content-Length"
-        ~value:(string_of_int @@ String.length (View.to_string html))
+        ~value:
+          (string_of_int @@ String.length (Format.asprintf "%a" (Tyxml.Html.pp ()) html))
+        response
+    in
+    { response with body }
+  | Static filename ->
+    let string =
+      let ic = open_in filename in
+      let file_data = In_channel.input_all ic in
+      let () = close_in ic in
+      file_data
+    in
+    let response =
+      set_header
+        ~key:"Content-Length"
+        ~value:(String.length string |> string_of_int)
         response
     in
     { response with body }
@@ -142,6 +163,8 @@ let content_type_of_body = function
   | String _ -> Some "text/plain"
   | Html _ -> Some "text/html"
   | Json _ -> Some "application/json"
+  | Static _ ->
+    Some "text/css" (* FIXME: Passar o tipo de acordo com a extensão do arquivo *)
   | EmptyBody -> None
 ;;
 

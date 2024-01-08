@@ -1,5 +1,7 @@
 (executable
  (public_name corcova)
  (name main)
- (flags (:standard -cclib -static))
+ (flags
+  -short-paths
+  (:standard -cclib -static))
  (libraries views corcova unix yojson))

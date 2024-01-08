@@ -22,7 +22,7 @@
             ocamlformat
           ];
 
-          buildInputs = with pkgs'.ocamlPackages; [ yojson ppx_expect utop ];
+          buildInputs = with pkgs'.ocamlPackages; [ yojson ppx_expect utop tyxml ];
         };
 
         packages.default = pkgs'.ocamlPackages.buildDunePackage rec {
