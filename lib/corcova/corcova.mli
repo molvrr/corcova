@@ -18,7 +18,7 @@ module Router : sig
   val scope : ?prefix:string -> middleware list -> route list -> route list
   val get : string -> (Request.t -> Response.t -> Response.t) -> route
   val post : string -> (Request.t -> Response.t -> Response.t) -> route
-  val add_routes : t -> routes:route list -> t
+  val router : route list -> middleware list -> t -> t
 
   module Utils : sig
     val path : route -> string

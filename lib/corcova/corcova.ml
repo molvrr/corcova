@@ -21,6 +21,7 @@ type t =
   { port : int
   ; host : string
   ; routes : route list
+  ; router : Request.t -> Response.t
   }
 
 let compose (middleware_list : middleware list) =
@@ -66,8 +67,25 @@ module Router = struct
     { verb = `POST; middlewares = []; handler; path }
   ;;
 
-  let add_routes app ~routes =
-    List.fold_left (fun app route -> { app with routes = route :: app.routes }) app routes
+  (*
+     Este tem que ser o entrypoint para o servidor.
+     A ideia é um cliente conectar, a gente executa a função que o router adiciona à aplicação
+     Acho que posso adicionar os stages do request aqui
+  *)
+  let router routes middleware_list app =
+    let app =
+      List.fold_left
+        (fun app route -> { app with routes = route :: app.routes })
+        app
+        routes
+    in
+    { app with
+      router =
+        (fun req ->
+          let req, _ = compose middleware_list req Response.empty in
+          let resp = handle_request routes req in
+          resp)
+    }
   ;;
 
   module Utils = struct
@@ -133,7 +151,10 @@ let send response client =
   ()
 ;;
 
-let empty = { port = 3000; host = "0.0.0.0"; routes = [] }
+let empty =
+  { port = 7000; host = "0.0.0.0"; routes = []; router = (fun _ -> Response.empty) }
+;;
+
 let set_host app ~host = { app with host }
 let set_port app ~port = { app with port }
 
@@ -177,7 +198,7 @@ let run app =
   let rec main () =
     let client, _ = accept sock in
     let request = Request.of_fd client in
-    let response = handle_request app.routes request in
+    let response = app.router request in
     let _ = send response client in
     let _ = close client in
     main ()

@@ -31,7 +31,7 @@ let logger : t =
   let () =
     Format.printf
       "%02d:%02d:%02d - %s %s\n%!"
-      time.tm_hour
+      (time.tm_hour - 3)
       time.tm_min
       time.tm_sec
       ((function

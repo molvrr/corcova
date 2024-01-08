@@ -49,7 +49,7 @@ let set_header (response : t) ~key ~value =
 ;;
 
 let set_body (response : t) ~(body : body) =
-  (* NOTE: Só definir Content-Length na hora renderizar? *)
+  (* FIXME: Só definir Content-Length na hora renderizar? *)
   match body with
   | EmptyBody -> { response with body }
   | Json json ->
